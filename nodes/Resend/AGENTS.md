@@ -15,6 +15,7 @@
 
 ## Patterns & Conventions
 - DO: Keep the main node description and properties in `nodes/Resend/Resend.node.ts`.
+- DO: Ensure `description` includes core fields (`displayName`, `name`, `icon`, `group`, `version`, `description`, `defaults`, `inputs`, `outputs`, `credentials`) as shown in `nodes/Resend/Resend.node.ts`.
 - DO: Implement resource/operation logic in the `execute` flow in `nodes/Resend/Resend.node.ts`.
 - DO: Use `displayOptions` to scope fields per resource/operation like in `nodes/Resend/Resend.node.ts`.
 - DO: Use `this.helpers.httpRequest` for Resend API calls as in `nodes/Resend/Resend.node.ts`.

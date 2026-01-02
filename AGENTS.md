@@ -14,6 +14,7 @@
 - Lint: `npm run lint`
 - Format: `npm run format`
 - Tests: not configured (no npm test script)
+- n8n-node CLI (optional): `n8n-node dev`, `n8n-node build`, `n8n-node new`
 
 ## Universal Conventions
 - Node >= 20.15 (see `package.json`)
@@ -22,6 +23,9 @@
 - ESLint uses n8n-nodes-base rules for nodes/credentials (see `.eslintrc.js`)
 - Default branch is master; PRs target master (see `.github/workflows/ci.yml`)
 - dist/ is generated; do not hand-edit
+- Package name must start with `n8n-nodes-` and include keyword `n8n-community-node-package` (see `package.json`)
+- `package.json` `n8n` object must map built `dist/credentials/*.credentials.js` and `dist/nodes/**/*.node.js`
+- Community nodes should keep a README for verification submissions
 
 ## Security & Secrets
 - Never commit Resend API keys or webhook signing secrets
@@ -42,9 +46,11 @@
 - Webhook logic: `rg -n "webhook" nodes/Resend/ResendTrigger.node.ts`
 - Credential auth: `rg -n "authenticate" credentials/ResendApi.credentials.ts`
 - Credential test: `rg -n "test:" credentials/ResendApi.credentials.ts`
+- n8n package metadata: `rg -n "\"n8n\"|n8n-community-node-package" package.json`
 
 ## Definition of Done
 - `npm run build` succeeds and generates `dist/`
 - `npm run lint` passes
 - `npm run format` produces no diffs
 - No secrets added to git history
+- If preparing for community verification, use `n8n-node` tooling to validate structure
