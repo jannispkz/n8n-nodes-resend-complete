@@ -66,14 +66,14 @@ export class Resend implements INodeType {
 						description: 'Manage contact segments',
 					},
 					{
-						name: 'Topic',
-						value: 'topics',
-						description: 'Manage subscription topics',
-					},
-					{
 						name: 'Template',
 						value: 'templates',
 						description: 'Manage email templates',
+					},
+					{
+						name: 'Topic',
+						value: 'topics',
+						description: 'Manage subscription topics',
 					},
 				],
 				default: 'email',
@@ -337,13 +337,6 @@ export class Resend implements INodeType {
 						description: 'CC recipient email addresses (comma-separated)',
 					},
 					{
-						displayName: 'Reply To',
-						name: 'reply_to',
-						type: 'string',
-						default: '',
-						description: 'Reply-to email address. For multiple addresses, use comma-separated values.',
-					},
-					{
 						displayName: 'Headers',
 						name: 'headers',
 						type: 'fixedCollection',
@@ -373,6 +366,20 @@ export class Resend implements INodeType {
 							},
 						],
 						description: 'Custom headers to add to the email',
+					},
+					{
+						displayName: 'Reply To',
+						name: 'reply_to',
+						type: 'string',
+						default: '',
+						description: 'Reply-to email address. For multiple addresses, use comma-separated values.',
+					},
+					{
+						displayName: 'Scheduled At',
+						name: 'scheduled_at',
+						type: 'string',
+						default: '',
+						description: 'Schedule email to be sent later (e.g., "in 1 min" or ISO 8601 format)',
 					},
 					{
 						displayName: 'Tags',
@@ -412,13 +419,6 @@ export class Resend implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'Topic ID to scope the email to',
-					},
-					{
-						displayName: 'Scheduled At',
-						name: 'scheduled_at',
-						type: 'string',
-						default: '',
-						description: 'Schedule email to be sent later (e.g., "in 1 min" or ISO 8601 format)',
 					},
 				],
 			},
@@ -554,8 +554,11 @@ export class Resend implements INodeType {
 						displayName: 'Limit',
 						name: 'limit',
 						type: 'number',
-						default: 20,
-						description: 'Max number of emails to return (1-100)',
+						typeOptions: {
+							minValue: 1,
+						},
+						default: 50,
+						description: 'Max number of results to return',
 					},
 					{
 						displayName: 'After',
@@ -603,7 +606,7 @@ export class Resend implements INodeType {
 						operation: ['create'],
 					},
 				},
-				description: 'Sender email address. To include a friendly name, use the format "Your Name <sender@domain.com>".',
+				description: 'Sender email address. To include a friendly name, use the format "Your Name &lt;sender@domain.com&gt;".',
 			},
 			{
 				displayName: 'Subject',
@@ -690,7 +693,7 @@ export class Resend implements INodeType {
 				],
 			},
 			{
-				displayName: 'Template ID',
+				displayName: 'Template Name or ID',
 				name: 'templateId',
 				type: 'options',
 				required: true,
@@ -705,7 +708,7 @@ export class Resend implements INodeType {
 						operation: ['get', 'update', 'delete', 'send'],
 					},
 				},
-				description: 'Select a template or enter an ID/alias using an expression',
+				description: 'Select a template or enter an ID/alias using an expression. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 			},
 			{
 				displayName: 'Update Fields',
@@ -796,8 +799,11 @@ export class Resend implements INodeType {
 						displayName: 'Limit',
 						name: 'limit',
 						type: 'number',
-						default: 20,
-						description: 'Max number of templates to return (1-100)',
+						typeOptions: {
+							minValue: 1,
+						},
+						default: 50,
+						description: 'Max number of results to return',
 					},
 					{
 						displayName: 'After',
@@ -1102,7 +1108,7 @@ export class Resend implements INodeType {
 						operation: ['create'],
 					},
 				},
-				description: 'Sender email address. To include a friendly name, use the format "Your Name <sender@domain.com>".',
+				description: 'Sender email address. To include a friendly name, use the format "Your Name &lt;sender@domain.com&gt;".',
 			},
 			{
 				displayName: 'Subject',
@@ -1201,28 +1207,12 @@ export class Resend implements INodeType {
 				},
 				options: [
 					{
-						displayName: 'Segment ID',
-						name: 'segment_id',
-						type: 'string',
-						default: '',
-						placeholder: 'seg_123456',
-						description: 'The ID of the segment you want to send to',
-					},
-					{
 						displayName: 'From',
 						name: 'from',
 						type: 'string',
 						default: '',
 						placeholder: 'you@example.com',
 						description: 'Sender email address',
-					},
-					{
-						displayName: 'Subject',
-						name: 'subject',
-						type: 'string',
-						default: '',
-						placeholder: 'Newsletter Subject',
-						description: 'Email subject',
 					},
 					{
 						displayName: 'HTML Content',
@@ -1236,15 +1226,12 @@ export class Resend implements INodeType {
 						description: 'The HTML version of the message',
 					},
 					{
-						displayName: 'Text Content',
-						name: 'text',
+						displayName: 'Name',
+						name: 'name',
 						type: 'string',
 						default: '',
-						typeOptions: {
-							multiline: true,
-						},
-						placeholder: 'Your plain text content here',
-						description: 'The plain text version of the message',
+						placeholder: 'Internal broadcast name',
+						description: 'The friendly name of the broadcast. Only used for internal reference.',
 					},
 					{
 						displayName: 'Reply To',
@@ -1255,12 +1242,31 @@ export class Resend implements INodeType {
 						description: 'Reply-to email address. For multiple addresses, use comma-separated values.',
 					},
 					{
-						displayName: 'Name',
-						name: 'name',
+						displayName: 'Segment ID',
+						name: 'segment_id',
 						type: 'string',
 						default: '',
-						placeholder: 'Internal broadcast name',
-						description: 'The friendly name of the broadcast. Only used for internal reference.',
+						placeholder: 'seg_123456',
+						description: 'The ID of the segment you want to send to',
+					},
+					{
+						displayName: 'Subject',
+						name: 'subject',
+						type: 'string',
+						default: '',
+						placeholder: 'Newsletter Subject',
+						description: 'Email subject',
+					},
+					{
+						displayName: 'Text Content',
+						name: 'text',
+						type: 'string',
+						default: '',
+						typeOptions: {
+							multiline: true,
+						},
+						placeholder: 'Your plain text content here',
+						description: 'The plain text version of the message',
 					},
 					{
 						displayName: 'Topic ID',
@@ -1291,7 +1297,7 @@ export class Resend implements INodeType {
 						type: 'string',
 						default: '',
 						placeholder: 'in 1 min',
-						description: 'Schedule the broadcast to be sent later (natural language or ISO 8601).',
+						description: 'Schedule the broadcast to be sent later (natural language or ISO 8601)',
 					},
 				],
 			},
@@ -1312,8 +1318,11 @@ export class Resend implements INodeType {
 						displayName: 'Limit',
 						name: 'limit',
 						type: 'number',
-						default: 20,
-						description: 'Max number of broadcasts to return (1-100)',
+						typeOptions: {
+							minValue: 1,
+						},
+						default: 50,
+						description: 'Max number of results to return',
 					},
 					{
 						displayName: 'After',
@@ -1349,7 +1358,7 @@ export class Resend implements INodeType {
 				description: 'The name of the segment',
 			},
 			{
-				displayName: 'Segment ID',
+				displayName: 'Segment Name or ID',
 				name: 'segmentId',
 				type: 'options',
 				required: true,
@@ -1364,7 +1373,7 @@ export class Resend implements INodeType {
 						operation: ['get', 'delete'],
 					},
 				},
-				description: 'Select a segment or enter an ID using an expression',
+				description: 'Select a segment or enter an ID using an expression. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 			},
 			{
 				displayName: 'List Options',
@@ -1383,8 +1392,11 @@ export class Resend implements INodeType {
 						displayName: 'Limit',
 						name: 'limit',
 						type: 'number',
-						default: 20,
-						description: 'Max number of segments to return (1-100)',
+						typeOptions: {
+							minValue: 1,
+						},
+						default: 50,
+						description: 'Max number of results to return',
 					},
 					{
 						displayName: 'After',
@@ -1471,7 +1483,7 @@ export class Resend implements INodeType {
 				],
 			},
 			{
-				displayName: 'Topic ID',
+				displayName: 'Topic Name or ID',
 				name: 'topicId',
 				type: 'options',
 				required: true,
@@ -1486,7 +1498,7 @@ export class Resend implements INodeType {
 						operation: ['get', 'update', 'delete'],
 					},
 				},
-				description: 'Select a topic or enter an ID using an expression',
+				description: 'Select a topic or enter an ID using an expression. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 			},
 			{
 				displayName: 'Update Fields',
@@ -1545,8 +1557,11 @@ export class Resend implements INodeType {
 						displayName: 'Limit',
 						name: 'limit',
 						type: 'number',
-						default: 20,
-						description: 'Max number of topics to return (1-100)',
+						typeOptions: {
+							minValue: 1,
+						},
+						default: 50,
+						description: 'Max number of results to return',
 					},
 					{
 						displayName: 'After',
@@ -1673,13 +1688,6 @@ export class Resend implements INodeType {
 						description: 'The last name of the contact',
 					},
 					{
-						displayName: 'Unsubscribed',
-						name: 'unsubscribed',
-						type: 'boolean',
-						default: false,
-						description: 'Whether the contact is unsubscribed from emails',
-					},
-					{
 						displayName: 'Properties',
 						name: 'properties',
 						type: 'fixedCollection',
@@ -1767,6 +1775,13 @@ export class Resend implements INodeType {
 							},
 						],
 					},
+					{
+						displayName: 'Unsubscribed',
+						name: 'unsubscribed',
+						type: 'boolean',
+						default: false,
+						description: 'Whether the contact is unsubscribed from emails',
+					},
 				],
 			},
 			{
@@ -1852,8 +1867,11 @@ export class Resend implements INodeType {
 						displayName: 'Limit',
 						name: 'limit',
 						type: 'number',
-						default: 20,
-						description: 'Max number of contacts to return (1-100)',
+						typeOptions: {
+							minValue: 1,
+						},
+						default: 50,
+						description: 'Max number of results to return',
 					},
 					{
 						displayName: 'After',
