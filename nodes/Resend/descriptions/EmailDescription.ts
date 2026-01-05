@@ -842,11 +842,11 @@ export const emailFields: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		displayOptions: {
-			show: {
-				resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts'],
-				operation: ['list'],
+				show: {
+					resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts', 'webhooks'],
+					operation: ['list'],
+				},
 			},
-		},
 		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
@@ -858,11 +858,11 @@ export const emailFields: INodeProperties[] = [
 		},
 		default: 50,
 		displayOptions: {
-			show: {
-				resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts'],
-				operation: ['list'],
-				returnAll: [false],
-			},
+				show: {
+					resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts', 'webhooks'],
+					operation: ['list'],
+					returnAll: [false],
+				},
 		},
 		description: 'Max number of results to return',
 	},

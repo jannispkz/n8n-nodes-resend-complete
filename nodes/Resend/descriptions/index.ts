@@ -6,3 +6,4 @@ export * from './BroadcastDescription';
 export * from './SegmentDescription';
 export * from './TopicDescription';
 export * from './ContactDescription';
+export * from './WebhookDescription';

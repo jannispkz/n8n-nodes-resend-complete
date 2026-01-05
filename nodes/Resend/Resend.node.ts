@@ -23,6 +23,8 @@ import {
 	templateOperations,
 	topicFields,
 	topicOperations,
+	webhookFields,
+	webhookOperations,
 } from './descriptions';
 import {
 	buildTemplateSendVariables,
@@ -43,8 +45,8 @@ export class Resend implements INodeType {
 		icon: 'file:resend-icon-white.svg',
 		group: ['output'],
 		version: 1,
-		description: 'Interact with Resend API for emails, templates, domains, API keys, broadcasts, segments, topics, and contacts',
-		subtitle: '={{(() => { const resourceLabels = { apiKeys: "api key", broadcasts: "broadcast", contacts: "contact", domains: "domain", email: "email", segments: "segment", templates: "template", topics: "topic" }; const operationLabels = { retrieve: "get", sendBatch: "send batch" }; const resource = $parameter["resource"]; const operation = $parameter["operation"]; const resourceLabel = resourceLabels[resource] ?? resource; const operationLabel = operationLabels[operation] ?? operation; return operationLabel + ": " + resourceLabel; })() }}',
+		description: 'Interact with Resend API for emails, templates, domains, API keys, broadcasts, segments, topics, contacts, and webhooks',
+		subtitle: '={{(() => { const resourceLabels = { apiKeys: "api key", broadcasts: "broadcast", contacts: "contact", domains: "domain", email: "email", segments: "segment", templates: "template", topics: "topic", webhooks: "webhook" }; const operationLabels = { retrieve: "get", sendBatch: "send batch" }; const resource = $parameter["resource"]; const operation = $parameter["operation"]; const resourceLabel = resourceLabels[resource] ?? resource; const operationLabel = operationLabels[operation] ?? operation; return operationLabel + ": " + resourceLabel; })() }}',
 		defaults: {
 			name: 'Resend',
 		},
@@ -77,6 +79,11 @@ export class Resend implements INodeType {
 						name: 'Contact',
 						value: 'contacts',
 						description: 'Manage contacts',
+					},
+					{
+						name: 'Webhook',
+						value: 'webhooks',
+						description: 'Manage webhooks',
 					},
 					{
 						name: 'Domain',
@@ -115,6 +122,7 @@ export class Resend implements INodeType {
 			...segmentOperations,
 			...topicOperations,
 			...contactOperations,
+			...webhookOperations,
 
 			...emailFields,
 			...templateFields,
@@ -124,6 +132,7 @@ export class Resend implements INodeType {
 			...segmentFields,
 			...topicFields,
 			...contactFields,
+			...webhookFields,
 		],
 	};
 	methods = {
@@ -138,6 +147,16 @@ export class Resend implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 		const length = items.length;
+		const assertHttpsEndpoint = (endpoint: string, itemIndex: number) => {
+			const normalizedEndpoint = endpoint.trim().toLowerCase();
+			if (normalizedEndpoint.startsWith('http://')) {
+				throw new NodeOperationError(
+					this.getNode(),
+					'Invalid webhook endpoint scheme. Resend requires a publicly reachable HTTPS URL.',
+					{ itemIndex },
+				);
+			}
+		};
 		for (let i = 0; i < length; i++) {
 			try {
 				const resource = this.getNodeParameter('resource', i) as string;
@@ -1174,6 +1193,128 @@ export class Resend implements INodeType {
 
 						response = await this.helpers.httpRequest({
 							url: `https://api.resend.com/contacts/${encodedIdentifier}`,
+							method: 'DELETE',
+							headers: {
+								Authorization: `Bearer ${apiKey}`,
+							},
+							json: true,
+						});
+					}
+					// WEBHOOK OPERATIONS
+				} else if (resource === 'webhooks') {
+					if (operation === 'create') {
+						const endpoint = this.getNodeParameter('webhookEndpoint', i) as string;
+						const events = this.getNodeParameter('webhookEvents', i) as string[];
+						assertHttpsEndpoint(endpoint, i);
+
+						const requestBody = {
+							endpoint,
+							events,
+						};
+
+						response = await this.helpers.httpRequest({
+							url: 'https://api.resend.com/webhooks',
+							method: 'POST',
+							headers: {
+								Authorization: `Bearer ${apiKey}`,
+								'Content-Type': 'application/json',
+							},
+							body: requestBody,
+							json: true,
+						});
+					} else if (operation === 'get') {
+						const webhookId = this.getNodeParameter('webhookId', i) as string;
+						const encodedWebhookId = encodeURIComponent(webhookId);
+
+						response = await this.helpers.httpRequest({
+							url: `https://api.resend.com/webhooks/${encodedWebhookId}`,
+							method: 'GET',
+							headers: {
+								Authorization: `Bearer ${apiKey}`,
+							},
+							json: true,
+						});
+					} else if (operation === 'list') {
+						const listOptions = this.getNodeParameter('webhookListOptions', i, {}) as ListOptions;
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const limit = this.getNodeParameter('limit', i, 50) as number;
+						response = await requestList(this, 'https://api.resend.com/webhooks', listOptions, apiKey, i, returnAll, limit);
+					} else if (operation === 'update') {
+						const webhookId = this.getNodeParameter('webhookId', i) as string;
+						const encodedWebhookId = encodeURIComponent(webhookId);
+						const updateFields = this.getNodeParameter('webhookUpdateFields', i, {}) as {
+							endpoint?: string;
+							events?: string[];
+							status?: string;
+						};
+
+						if (!Object.keys(updateFields).length) {
+							throw new NodeOperationError(
+								this.getNode(),
+								'Add at least one field to update.',
+								{ itemIndex: i },
+							);
+						}
+
+						let endpoint = updateFields.endpoint?.trim();
+						let events = Array.isArray(updateFields.events) && updateFields.events.length
+							? updateFields.events
+							: undefined;
+						let status = updateFields.status;
+
+						if (endpoint) {
+							assertHttpsEndpoint(endpoint, i);
+						}
+
+						if (!endpoint || !events || !status) {
+							const currentWebhook = await this.helpers.httpRequest({
+								url: `https://api.resend.com/webhooks/${encodedWebhookId}`,
+								method: 'GET',
+								headers: {
+									Authorization: `Bearer ${apiKey}`,
+								},
+								json: true,
+							});
+
+							endpoint = endpoint ?? currentWebhook?.endpoint ?? currentWebhook?.url;
+							events = events ?? currentWebhook?.events;
+							status = status ?? currentWebhook?.status;
+						}
+
+						if (!endpoint || !events || !status) {
+							throw new NodeOperationError(
+								this.getNode(),
+								'Webhook update requires endpoint, events, and status.',
+								{ itemIndex: i },
+							);
+						}
+
+						if (endpoint) {
+							assertHttpsEndpoint(endpoint, i);
+						}
+
+						const requestBody = {
+							endpoint,
+							events,
+							status,
+						};
+
+						response = await this.helpers.httpRequest({
+							url: `https://api.resend.com/webhooks/${encodedWebhookId}`,
+							method: 'PATCH',
+							headers: {
+								Authorization: `Bearer ${apiKey}`,
+								'Content-Type': 'application/json',
+							},
+							body: requestBody,
+							json: true,
+						});
+					} else if (operation === 'delete') {
+						const webhookId = this.getNodeParameter('webhookId', i) as string;
+						const encodedWebhookId = encodeURIComponent(webhookId);
+
+						response = await this.helpers.httpRequest({
+							url: `https://api.resend.com/webhooks/${encodedWebhookId}`,
 							method: 'DELETE',
 							headers: {
 								Authorization: `Bearer ${apiKey}`,
