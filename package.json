@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-resend-revived",
-  "version": "1.2.3",
+  "version": "2.0.0",
   "description": "Resend n8n node",
   "keywords": [
     "n8n-community-node-package",
