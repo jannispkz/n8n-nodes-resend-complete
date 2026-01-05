@@ -2945,6 +2945,20 @@ export class Resend implements INodeType {
 									}
 									return attachmentEntry;
 								} else if (attachment.attachmentType === 'url') {
+									if (!attachment.filename) {
+										throw new NodeOperationError(
+											this.getNode(),
+											'File Name is required for URL attachments.',
+											{ itemIndex: i },
+										);
+									}
+									if (!attachment.fileUrl) {
+										throw new NodeOperationError(
+											this.getNode(),
+											'File URL is required for URL attachments.',
+											{ itemIndex: i },
+										);
+									}
 									const attachmentEntry: Record<string, unknown> = {
 										filename: attachment.filename,
 										path: attachment.fileUrl,
