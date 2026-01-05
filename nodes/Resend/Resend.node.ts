@@ -366,32 +366,37 @@ export class Resend implements INodeType {
 
 						const emails = emailsData.emails.map((email: any) => {
 							const contentType = email.contentType ?? 'html';
+							const additionalOptions = email.additionalOptions ?? {};
 							const emailObj: any = {
 								from: email.from,
 								to: normalizeEmailList(email.to),
 								subject: email.subject,
 							};
 
-							if (email.cc) {
-								const ccList = normalizeEmailList(email.cc);
+							const ccValue = additionalOptions.cc ?? email.cc;
+							if (ccValue) {
+								const ccList = normalizeEmailList(ccValue);
 								if (ccList.length) {
 									emailObj.cc = ccList;
 								}
 							}
-							if (email.bcc) {
-								const bccList = normalizeEmailList(email.bcc);
+							const bccValue = additionalOptions.bcc ?? email.bcc;
+							if (bccValue) {
+								const bccList = normalizeEmailList(bccValue);
 								if (bccList.length) {
 									emailObj.bcc = bccList;
 								}
 							}
-							if (email.reply_to) {
-								const replyToList = normalizeEmailList(email.reply_to);
+							const replyToValue = additionalOptions.reply_to ?? email.reply_to;
+							if (replyToValue) {
+								const replyToList = normalizeEmailList(replyToValue);
 								if (replyToList.length) {
 									emailObj.reply_to = replyToList;
 								}
 							}
-							if (email.attachments?.attachments?.length) {
-								emailObj.attachments = email.attachments.attachments.map((attachment: any) => {
+							const attachments = additionalOptions.attachments ?? email.attachments;
+							if (attachments?.attachments?.length) {
+								emailObj.attachments = attachments.attachments.map((attachment: any) => {
 									const binaryPropertyName = attachment.binaryPropertyName || 'data';
 									const binaryData = items[i].binary?.[binaryPropertyName];
 									if (!binaryData) {
@@ -422,9 +427,10 @@ export class Resend implements INodeType {
 									return attachmentEntry;
 								});
 							}
-							if (email.headers?.headers?.length) {
+							const headersInput = additionalOptions.headers ?? email.headers;
+							if (headersInput?.headers?.length) {
 								const headers: Record<string, string> = {};
-								for (const header of email.headers.headers) {
+								for (const header of headersInput.headers) {
 									if (header.name) {
 										headers[header.name] = header.value ?? '';
 									}
@@ -433,16 +439,18 @@ export class Resend implements INodeType {
 									emailObj.headers = headers;
 								}
 							}
-							if (email.tags?.tags?.length) {
-								emailObj.tags = email.tags.tags
+							const tagsInput = additionalOptions.tags ?? email.tags;
+							if (tagsInput?.tags?.length) {
+								emailObj.tags = tagsInput.tags
 									.filter((tag: { name?: string }) => tag.name)
 									.map((tag: { name: string; value?: string }) => ({
 										name: tag.name,
 										value: tag.value ?? '',
 									}));
 							}
-							if (email.topic_id) {
-								emailObj.topic_id = email.topic_id;
+							const topicId = additionalOptions.topic_id ?? email.topic_id;
+							if (topicId) {
+								emailObj.topic_id = topicId;
 							}
 
 							if (contentType === 'template') {

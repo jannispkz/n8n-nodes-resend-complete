@@ -13,7 +13,8 @@ export const emailOperations: INodeProperties[] = [
 			show: {
 				resource: ['email'],
 			},
-		}, options: [
+		},
+		options: [
 			{
 				name: 'Cancel',
 				value: 'cancel',
@@ -261,7 +262,8 @@ export const emailFields: INodeProperties[] = [
 				resource: ['email'],
 				operation: ['send'],
 			},
-		},				options: [
+		},
+		options: [
 			{
 				displayName: 'Attachments',
 				name: 'attachments',
@@ -472,70 +474,6 @@ export const emailFields: INodeProperties[] = [
 				displayName: 'Email',
 				values: [
 					{
-						displayName: 'Attachments',
-						name: 'attachments',
-						type: 'fixedCollection',
-						default: { attachments: [] },
-						typeOptions: {
-							multipleValues: true,
-						},
-						options: [
-							{
-								name: 'attachments',
-								displayName: 'Attachment',
-								values: [
-									{
-										displayName: 'Binary Property',
-										name: 'binaryPropertyName',
-										type: 'string',
-										default: 'data',
-										placeholder: 'data',
-										description: 'Name of the binary property which contains the file data',
-									},
-									{
-										displayName: 'Content ID',
-										name: 'content_id',
-										type: 'string',
-										default: '',
-										placeholder: 'image-1',
-										description: 'Content ID for embedding inline attachments via cid:',
-									},
-									{
-										displayName: 'Content Type',
-										name: 'content_type',
-										type: 'string',
-										default: '',
-										placeholder: 'application/pdf',
-										description: 'Content type for the attachment',
-									},
-									{
-										displayName: 'File Name',
-										name: 'filename',
-										type: 'string',
-										default: '',
-										placeholder: 'document.pdf',
-										description: 'Name for the attached file',
-									},
-								],
-							},
-						],
-						description: 'Attachments for this email (binary data only)',
-					},
-					{
-						displayName: 'BCC',
-						name: 'bcc',
-						type: 'string',
-						default: '',
-						description: 'BCC recipient email addresses (comma-separated)',
-					},
-					{
-						displayName: 'CC',
-						name: 'cc',
-						type: 'string',
-						default: '',
-						description: 'CC recipient email addresses (comma-separated)',
-					},
-					{
 						displayName: 'Content Type',
 						name: 'contentType',
 						type: 'options',
@@ -574,35 +512,22 @@ export const emailFields: INodeProperties[] = [
 						description: 'Sender email address',
 					},
 					{
-						displayName: 'Headers',
-						name: 'headers',
-						type: 'fixedCollection',
-						default: { headers: [] },
-						typeOptions: {
-							multipleValues: true,
-						},
-						options: [
-							{
-								name: 'headers',
-								displayName: 'Header',
-								values: [
-									{
-										displayName: 'Name',
-										name: 'name',
-										type: 'string',
-										required: true,
-										default: '',
-									},
-									{
-										displayName: 'Value',
-										name: 'value',
-										type: 'string',
-										default: '',
-									},
-								],
-							},
-						],
-						description: 'Custom headers to add to the email',
+						displayName: 'To',
+						name: 'to',
+						type: 'string',
+						required: true,
+						default: '',
+						placeholder: 'user@example.com',
+						description: 'Recipient email address (comma-separated for multiple)',
+					},
+					{
+						displayName: 'Subject',
+						name: 'subject',
+						type: 'string',
+						required: true,
+						default: '',
+						placeholder: 'Hello from n8n!',
+						description: 'Email subject',
 					},
 					{
 						displayName: 'HTML Content',
@@ -621,52 +546,20 @@ export const emailFields: INodeProperties[] = [
 						},
 					},
 					{
-						displayName: 'Reply To',
-						name: 'reply_to',
+						displayName: 'Text Content',
+						name: 'text',
 						type: 'string',
 						default: '',
-						description: 'Reply-to email address. For multiple addresses, use comma-separated values.',
-					},
-					{
-						displayName: 'Subject',
-						name: 'subject',
-						type: 'string',
-						required: true,
-						default: '',
-						placeholder: 'Hello from n8n!',
-						description: 'Email subject',
-					},
-					{
-						displayName: 'Tags',
-						name: 'tags',
-						type: 'fixedCollection',
-						default: { tags: [] },
+						description: 'Plain text content of the email',
 						typeOptions: {
-							multipleValues: true,
+							rows: 4,
 						},
-						options: [
-							{
-								name: 'tags',
-								displayName: 'Tag',
-								values: [
-									{
-										displayName: 'Name',
-										name: 'name',
-										type: 'string',
-										required: true,
-										default: '',
-									},
-									{
-										displayName: 'Value',
-										name: 'value',
-										type: 'string',
-										required: true,
-										default: '',
-									},
-								],
+						placeholder: 'Your plain text content here',
+						displayOptions: {
+							show: {
+								contentType: ['text', 'both'],
 							},
-						],
-						description: 'Tags to attach to the email',
+						},
 					},
 					{
 						displayName: 'Template Name or ID',
@@ -729,36 +622,154 @@ export const emailFields: INodeProperties[] = [
 						],
 					},
 					{
-						displayName: 'Text Content',
-						name: 'text',
-						type: 'string',
-						default: '',
-						description: 'Plain text content of the email',
-						typeOptions: {
-							rows: 4,
-						},
-						placeholder: 'Your plain text content here',
-						displayOptions: {
-							show: {
-								contentType: ['text', 'both'],
+						displayName: 'Additional Options',
+						name: 'additionalOptions',
+						type: 'collection',
+						placeholder: 'Add Option',
+						default: {},
+						options: [
+							{
+								displayName: 'Attachments',
+								name: 'attachments',
+								type: 'fixedCollection',
+								default: { attachments: [] },
+								typeOptions: {
+									multipleValues: true,
+								},
+								options: [
+									{
+										name: 'attachments',
+										displayName: 'Attachment',
+										values: [
+											{
+												displayName: 'Binary Property',
+												name: 'binaryPropertyName',
+												type: 'string',
+												default: 'data',
+												placeholder: 'data',
+												description: 'Name of the binary property which contains the file data',
+											},
+											{
+												displayName: 'Content ID',
+												name: 'content_id',
+												type: 'string',
+												default: '',
+												placeholder: 'image-1',
+												description: 'Content ID for embedding inline attachments via cid:',
+											},
+											{
+												displayName: 'Content Type',
+												name: 'content_type',
+												type: 'string',
+												default: '',
+												placeholder: 'application/pdf',
+												description: 'Content type for the attachment',
+											},
+											{
+												displayName: 'File Name',
+												name: 'filename',
+												type: 'string',
+												default: '',
+												placeholder: 'document.pdf',
+												description: 'Name for the attached file',
+											},
+										],
+									},
+								],
+								description: 'Attachments for this email (binary data only)',
 							},
-						},
-					},
-					{
-						displayName: 'To',
-						name: 'to',
-						type: 'string',
-						required: true,
-						default: '',
-						placeholder: 'user@example.com',
-						description: 'Recipient email address (comma-separated for multiple)',
-					},
-					{
-						displayName: 'Topic ID',
-						name: 'topic_id',
-						type: 'string',
-						default: '',
-						description: 'Topic ID to scope the email to',
+							{
+								displayName: 'BCC',
+								name: 'bcc',
+								type: 'string',
+								default: '',
+								description: 'BCC recipient email addresses (comma-separated)',
+							},
+							{
+								displayName: 'CC',
+								name: 'cc',
+								type: 'string',
+								default: '',
+								description: 'CC recipient email addresses (comma-separated)',
+							},
+							{
+								displayName: 'Headers',
+								name: 'headers',
+								type: 'fixedCollection',
+								default: { headers: [] },
+								typeOptions: {
+									multipleValues: true,
+								},
+								options: [
+									{
+										name: 'headers',
+										displayName: 'Header',
+										values: [
+											{
+												displayName: 'Name',
+												name: 'name',
+												type: 'string',
+												required: true,
+												default: '',
+											},
+											{
+												displayName: 'Value',
+												name: 'value',
+												type: 'string',
+												default: '',
+											},
+										],
+									},
+								],
+								description: 'Custom headers to add to the email',
+							},
+							{
+								displayName: 'Reply To',
+								name: 'reply_to',
+								type: 'string',
+								default: '',
+								description: 'Reply-to email address. For multiple addresses, use comma-separated values.',
+							},
+							{
+								displayName: 'Tags',
+								name: 'tags',
+								type: 'fixedCollection',
+								default: { tags: [] },
+								typeOptions: {
+									multipleValues: true,
+								},
+								options: [
+									{
+										name: 'tags',
+										displayName: 'Tag',
+										values: [
+											{
+												displayName: 'Name',
+												name: 'name',
+												type: 'string',
+												required: true,
+												default: '',
+											},
+											{
+												displayName: 'Value',
+												name: 'value',
+												type: 'string',
+												required: true,
+												default: '',
+											},
+										],
+									},
+								],
+								description: 'Tags to attach to the email',
+							},
+							{
+								displayName: 'Topic ID',
+								name: 'topic_id',
+								type: 'string',
+								default: '',
+								description: 'Topic ID to scope the email to',
+							},
+						],
 					},
 				],
 			},
@@ -842,11 +853,11 @@ export const emailFields: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		displayOptions: {
-				show: {
-					resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts', 'webhooks', 'contactProperties'],
-					operation: ['list'],
-				},
+			show: {
+				resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts', 'webhooks', 'contactProperties'],
+				operation: ['list'],
 			},
+		},
 		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
@@ -858,11 +869,11 @@ export const emailFields: INodeProperties[] = [
 		},
 		default: 50,
 		displayOptions: {
-				show: {
-					resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts', 'webhooks', 'contactProperties'],
-					operation: ['list'],
-					returnAll: [false],
-				},
+			show: {
+				resource: ['email', 'templates', 'domains', 'apiKeys', 'broadcasts', 'segments', 'topics', 'contacts', 'webhooks', 'contactProperties'],
+				operation: ['list'],
+				returnAll: [false],
+			},
 		},
 		description: 'Max number of results to return',
 	},
