@@ -15,14 +15,14 @@
     "contacts"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/jannispkz/n8n-nodes-resend/",
+  "homepage": "https://github.com/jannispkz/n8n-nodes-resend-complete/",
   "author": {
     "name": "jannispkz",
     "email": "jannispkz@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jannispkz/n8n-nodes-resend.git"
+    "url": "https://github.com/jannispkz/n8n-nodes-resend-complete.git"
   },
   "engines": {
     "node": ">=20.15"

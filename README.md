@@ -1,11 +1,11 @@
 <h1 align="center">
   <br>
-  <a href="/"><img src=".github/media/readme_header_new.png" alt="n8n-nodes-resend-revived" width="900"></a>
+  <a href="/"><img src=".github/media/readme_header_new.png" alt="n8n-nodes-resend-complete" width="900"></a>
   <br>
 </h1>
 
 <p align="center">
-  <a href="https://badge.fury.io/js/n8n-nodes-resend-revived"><img src="https://badge.fury.io/js/n8n-nodes-resend-revived.svg" alt="npm version"></a>
+  <a href="https://badge.fury.io/js/n8n-nodes-resend-complete"><img src="https://badge.fury.io/js/n8n-nodes-resend-complete.svg" alt="npm version"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
 
@@ -29,14 +29,14 @@ A community node for [n8n](https://n8n.io) that integrates with the [Resend](htt
 
 1. Go to **Settings** > **Community Nodes**
 2. Click **Install a community node**
-3. Enter `n8n-nodes-resend-revived`
+3. Enter `n8n-nodes-resend-complete`
 4. Restart n8n
 
 ### Manual Installation
 
 ```bash
 cd ~/.n8n
-npm install n8n-nodes-resend-revived
+npm install n8n-nodes-resend-complete
 ```
 
 ### Docker
@@ -44,7 +44,7 @@ npm install n8n-nodes-resend-revived
 ```bash
 docker run -it --rm \
   -p 5678:5678 \
-  -e N8N_NODES_INCLUDE=n8n-nodes-resend-revived \
+  -e N8N_NODES_INCLUDE=n8n-nodes-resend-complete \
   n8nio/n8n
 ```
 
@@ -190,7 +190,7 @@ The **Resend Trigger** node receives webhooks for real-time email events. Signat
 ## Development
 
 ```bash
-git clone https://github.com/jannispkz/n8n-nodes-resend.git
+git clone https://github.com/jannispkz/n8n-nodes-resend-complete.git
 cd n8n-nodes-resend
 npm install
 npm run build
@@ -204,7 +204,7 @@ npm run lint
 ---
 
 <p align="center">
-  <a href="https://github.com/jannispkz/n8n-nodes-resend">GitHub</a> |
-  <a href="https://github.com/jannispkz/n8n-nodes-resend/issues">Issues</a> |
+  <a href="https://github.com/jannispkz/n8n-nodes-resend-complete">GitHub</a> |
+  <a href="https://github.com/jannispkz/n8n-nodes-resend-complete/issues">Issues</a> |
   <a href="https://resend.com/docs">Resend Docs</a>
 </p>
